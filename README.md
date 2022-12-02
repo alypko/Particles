@@ -1,5 +1,4 @@
 <h1 align = center> Particles </h1>
-😈😈😈
 
 ## Installation 
 1. Generate empty project with [openFrameworks project generator](https://openframeworks.cc/download/). Add **ofxGui** addon to project.
