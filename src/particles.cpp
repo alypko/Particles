@@ -2,10 +2,10 @@
 
 
 particles::particles() {
-	attractPoints = NULL;
+	attractPoints = nullptr;
 }
 
-void particles::setAttractPoints(vector<glm::vec3>* attract) 
+void particles::setAttractPoints(vector<glm::vec3>* attract)
 {
 	attractPoints = attract;
 }
@@ -35,6 +35,7 @@ void particles::reset()
 	color.g = mass * 85.0f;
 	color.b = fmod(color.g, 200.0f);
 	color.r = fmod(color.b, color.g);
+	attractorMass = 8000.0f;
 
 
 }
@@ -47,6 +48,9 @@ void particles::update()
 		int closest = -1;
 		float closestDist = 9999999;
 
+		// Update position
+		pos += vel * deltaTime;
+
 		for (unsigned int i = 0; i < attractPoints->size(); i++)
 		{
 			float lenSq = glm::length2(attractPoints->at(i) - pos);
@@ -54,37 +58,36 @@ void particles::update()
 			{
 				closestDist = lenSq;
 				closest = i;
-
-
-				if (closest != -1)
-				{
-					closestPt = attractPoints->at(closest);
-					float dist = sqrt(closestDist);
-					glm::vec3 dir = (closestPt - pos) / dist;
-
-					frc = (1 / closestDist) * dir;
-					if (dist < ofGetWidth()) {
-
-						if (currMode == 1 && pos.x < (ofGetWidth() / 4))
-						{
-							//resisFrc *= 0;
-							resisFrc = -6 * 3.14159 * vel * visc * radius;
-							accsel = glm::normalize(frc + resisFrc) / mass;
-						}
-						else
-						{
-							accsel = glm::normalize(frc)/ mass;
-						}
-					}
-					
-					vel += accsel * deltaTime;
-
-				}
 			}
 		}
 
-		// Update position
-		pos += vel * deltaTime;
+		if (closest != -1)
+		{
+			closestPt = attractPoints->at(closest);
+			float dist = sqrt(closestDist);
+			glm::vec3 dir = (closestPt - pos) / dist;
+
+			//Update force
+			frc = mass * attractorMass / pow(closestDist + 50.0, 3.0 / 2.0) * (closestPt - pos);
+
+
+
+			if (currMode == 1 && pos.x < (ofGetWidth() / 4))
+			{
+				resisFrc = -6.0 * 3.14159 * vel * visc * radius;
+				accsel = (frc + resisFrc) / mass;
+			}
+			else
+			{
+				accsel = frc / mass;
+			}
+
+			vel += accsel * deltaTime;
+
+		}
+
+
+
 
 		if (pos.x > ofGetWidth()) {
 			pos.x = ofGetWidth();
@@ -109,5 +112,5 @@ void particles::draw()
 {
 	ofSetColor(color.r, color.g, color.b);
 	ofDrawCircle(pos.x, pos.y, scale * radius);
-	
+
 }
