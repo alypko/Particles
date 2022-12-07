@@ -35,13 +35,14 @@ void particles::reset()
 	color.g = mass * 85.0f;
 	color.b = fmod(color.g, 200.0f);
 	color.r = fmod(color.b, color.g);
-	attractorMass = 8000.0f;
+	attractorMass = 15000.0f;
 
 
 }
 
 void particles::update()
 {
+
 	if (attractPoints)
 	{
 		glm::vec3 closestPt;
@@ -68,7 +69,7 @@ void particles::update()
 			glm::vec3 dir = (closestPt - pos) / dist;
 
 			//Update force
-			frc = mass * attractorMass / pow(closestDist + 50.0, 3.0 / 2.0) * (closestPt - pos);
+			frc = mass * attractorMass / pow(closestDist + 100.0, 3.0 / 2.0) * (closestPt - pos);
 
 
 
